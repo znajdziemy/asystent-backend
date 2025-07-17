@@ -2,26 +2,20 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 
 app = Flask(__name__)
+CORS(app)  # otwiera dostęp dla frontendu
 
-# Zezwala na żądania z dowolnej domeny do endpointów /api/*
-CORS(app, resources={r"/api/*": {"origins": "*"}})
-
-@app.route("/api/query", methods=["POST"])
+@app.route("/api/query", methods=["POST", "GET"])
 def query():
-    data = request.get_json()
+    if request.method == "OPTIONS":
+        return jsonify({}), 200
+    data = request.get_json(silent=True) or {}
     query = data.get("query", "")
-
-    # Przykładowa symulacja wyników
-    result = (
-        f"Wyniki dla: {query}\n"
-        f"- OLX: Przykładowy wynik OLX\n"
-        f"- Allegro: Przykładowy wynik Allegro\n"
-        f"- Ceneo: Przykładowy wynik Ceneo\n"
-        f"- AliExpress: Przykładowy wynik AliExpress"
-    )
-
+    result = f"Wyniki dla: {query}\n - OLX: Przykładowy wynik\n - Allegro: Przykładowy wynik\n - Ceneo: Przykład\n - AliExpress: Przykład"
     return jsonify({"result": result})
 
+@app.route("/")
+def root():
+    return "Backend działa ✅", 200
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000, debug=True)
+    app.run(host="0.0.0.0", port=10000)
